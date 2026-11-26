@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ரசீது சரிபார்ப்பு - ஶ்ரீ பூவாடைக்காரியம்மன் ஶ்ரீ முனியப்பன் திருக்கோவில்</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Thambi+2:wght@500;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 18px;
+      font-family: 'Baloo Thambi 2', 'Poppins', sans-serif;
+      background: #f1f5f9;
+      min-height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .card {
+      width: 100%; max-width: 440px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+      border-top: 6px solid #8b0000;
+      border-bottom: 5px solid #006400;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .logo {
+      width: 82px; height: 82px; border-radius: 50%; object-fit: cover;
+      border: 3px solid #f59e0b; margin-bottom: 8px;
+    }
+    .temple-name { font-size: 17px; font-weight: 800; color: #8b0000; line-height: 1.35; margin: 0; }
+    .temple-addr { font-size: 12px; color: #475569; font-weight: 600; margin: 4px 0 16px; }
+
+    .badge-ok {
+      display: inline-block; background: #dcfce7; color: #166534;
+      border: 1.5px solid #16a34a; padding: 5px 16px; border-radius: 20px;
+      font-weight: 800; font-size: 14px; margin-bottom: 14px;
+    }
+    .badge-err {
+      display: inline-block; background: #fee2e2; color: #991b1b;
+      border: 1.5px solid #dc2626; padding: 5px 16px; border-radius: 20px;
+      font-weight: 800; font-size: 14px; margin-bottom: 14px;
+    }
+    .info-table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 6px; }
+    .info-table td { padding: 9px 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+    .info-table td.lbl { color: #64748b; font-weight: 700; width: 42%; }
+    .info-table td.val { color: #0f172a; font-weight: 700; }
+    .amt { color: #006400 !important; font-family: 'Poppins', sans-serif; font-size: 17px !important; }
+    .footer-note { font-size: 11.5px; color: #64748b; margin-top: 16px; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <img src="https://i.imgur.com/r1A2RFI.jpeg" alt="Temple Logo" class="logo">
+    <h1 class="temple-name">ஶ்ரீ பூவாடைக்காரியம்மன்<br>ஶ்ரீ முனியப்பன் திருக்கோவில்</h1>
+    <div class="temple-addr">பொ.துரிஞ்சிப்பட்டி, பாப்பிரெட்டிப்பட்டி வட்டம், தர்மபுரி மாவட்டம்</div>
+
+    <div id="statusBox">சரிபார்க்கப்படுகிறது...</div>
+    <div id="resultBox"></div>
+
+    <div class="footer-note">இது திருக்கோவில் நிர்வாகத்தால் வழங்கப்பட்ட அதிகாரப்பூர்வ மின்-ரசீது சரிபார்ப்புப் பக்கம்.</div>
+  </div>
+
+  <script>
+    // உங்கள் Apps Script Web App URL (.../exec) இங்கே ஒட்டவும்
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnVK5CIZbvyPCxeFivOGYjV0y1TeHnoDE_hIjqsF0yx4d6UqUXqILcCkuuJkZLNEviWw/exec";
+
+    const params = new URLSearchParams(window.location.search);
+    const recId = params.get("id");
+
+    if (!recId) {
+      document.getElementById("statusBox").innerHTML = `<div class="badge-err">✖ ரசீது எண் இல்லை</div>`;
+    } else {
+      fetch(`${APPS_SCRIPT_URL}?action=verify&id=${encodeURIComponent(recId)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.found) {
+            document.getElementById("statusBox").innerHTML = `<div class="badge-ok">✔ அதிகாரப்பூர்வ ரசீது (Verified)</div>`;
+            document.getElementById("resultBox").innerHTML = `
+              <table class="info-table">
+                <tr><td class="lbl">ரசீது எண்</td><td class="val">${data.receiptNo}</td></tr>
+                <tr><td class="lbl">தேதி</td><td class="val">${data.date}</td></tr>
+                <tr><td class="lbl">நன்கொடையாளர்</td><td class="val">${data.donorName}</td></tr>
+                <tr><td class="lbl">முகவரி / விவரம்</td><td class="val">${data.address}</td></tr>
+                <tr><td class="lbl">தொகை</td><td class="val amt">₹ ${data.amount} /-</td></tr>
+              </table>`;
+          } else {
+            document.getElementById("statusBox").innerHTML = `<div class="badge-err">✖ ரசீது பதிவு கிடைக்கவில்லை</div>`;
+          }
+        })
+        .catch(() => {
+          document.getElementById("statusBox").innerHTML = `<div class="badge-err">✖ சரிபார்க்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.</div>`;
+        });
+    }
+  </script>
+</body>
+</html>
