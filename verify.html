@@ -89,8 +89,8 @@
             document.getElementById("statusBox").innerHTML = `<div class="badge-err">✖ ரசீது பதிவு கிடைக்கவில்லை</div>`;
           }
         })
-        .catch(() => {
-          document.getElementById("statusBox").innerHTML = `<div class="badge-err">✖ சரிபார்க்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.</div>`;
+        .catch((err) => {
+          document.getElementById("statusBox").innerHTML = `<div class="badge-err">✖ சரிபார்க்க முடியவில்லை: ${err.message}</div>`;
         });
     }
   </script>
